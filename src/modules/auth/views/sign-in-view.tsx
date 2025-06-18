@@ -3,6 +3,8 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { OctagonAlertIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { FaGithub, FaGoogle } from "react-icons/fa";
 
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
@@ -21,8 +23,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Fa } from "zod/v4/locales";
 const fromSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(1, { message: "Password is required" }),
@@ -39,7 +41,24 @@ export const SignInView = () => {
       password: "",
     },
   });
-
+  const onSocial = (provider: "github" | "google") => {
+    setError(null);
+    setIsLoading(true);
+    authClient.signIn.social(
+      {
+        provider: provider,
+        callbackURL: "/",
+      },
+      {
+        onSuccess: () => {
+          setIsLoading(false);
+        },
+        onError: ({ error }) => {
+          setError(error.message);
+        },
+      }
+    );
+  };
   const onSubmit = (data: z.infer<typeof fromSchema>) => {
     setError(null);
     setIsLoading(true);
@@ -47,11 +66,12 @@ export const SignInView = () => {
       {
         email: data.email,
         password: data.password,
+        callbackURL: "/",
       },
       {
         onSuccess: () => {
-          router.push("/");
           setIsLoading(false);
+          router.push("/");
         },
         onError: ({ error }) => {
           setError(error.message);
@@ -124,20 +144,26 @@ export const SignInView = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <Button
+                    onClick={() => {
+                      onSocial("google");
+                    }}
                     disabled={isLoading}
                     type="button"
                     variant="outline"
                     className="w-full"
                   >
-                    Google
+                    <FaGoogle className="mr-2" />
                   </Button>
                   <Button
+                    onClick={() => {
+                      onSocial("github");
+                    }}
                     disabled={isLoading}
                     type="button"
                     variant="outline"
                     className="w-full"
                   >
-                    Github
+                    <FaGithub className="mr-2" />
                   </Button>
                 </div>
                 <div className="text-center text-sm">

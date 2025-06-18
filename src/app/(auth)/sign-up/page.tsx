@@ -1,7 +1,15 @@
 import { SignUpView } from "@/modules/auth/views/sign-up-view";
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+const Page = async () => {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
 
-const Page = () => {
-  console.log("SignUp page rendered");
+  if (!!session) {
+    redirect("/");
+  }
   return <SignUpView />;
 };
 

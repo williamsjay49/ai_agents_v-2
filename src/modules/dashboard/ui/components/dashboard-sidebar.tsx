@@ -39,7 +39,7 @@ const secondSection = [
   },
 ];
 
-const DashboardSidebar = () => {
+export const DashboardSidebar = () => {
   const pathname = usePathname();
 
   return (
@@ -121,5 +121,3 @@ const DashboardSidebar = () => {
     </Sidebar>
   );
 };
-
-export default DashboardSidebar;

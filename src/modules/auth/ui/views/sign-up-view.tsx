@@ -24,23 +24,32 @@ import Image from "next/image";
 import { useForm } from "react-hook-form";
 import Link from "next/link";
 import { useState } from "react";
-import { Fa } from "zod/v4/locales";
-const fromSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, { message: "Password is required" }),
-});
+const fromSchema = z
+  .object({
+    name: z.string().min(1, { message: "Name is required" }),
+    email: z.string().email("Invalid email address"),
+    password: z.string().min(1, { message: "Password is required" }),
+    confirmPassword: z.string().min(1, { message: "Password is required" }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
-export const SignInView = () => {
+export const SignUpView = () => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm({
     resolver: zodResolver(fromSchema),
     defaultValues: {
+      name: "",
       email: "",
       password: "",
+      confirmPassword: "",
     },
   });
+
   const onSocial = (provider: "github" | "google") => {
     setError(null);
     setIsLoading(true);
@@ -62,8 +71,9 @@ export const SignInView = () => {
   const onSubmit = (data: z.infer<typeof fromSchema>) => {
     setError(null);
     setIsLoading(true);
-    authClient.signIn.email(
+    authClient.signUp.email(
       {
+        name: data.name,
         email: data.email,
         password: data.password,
         callbackURL: "/",
@@ -87,12 +97,29 @@ export const SignInView = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="p-6 md:p-8">
               <div className="flex flex-col gap-6">
                 <div className="flex flex-col items-center text-center">
-                  <h1 className="text-2xl font-bold">Welcome back</h1>
+                  <h1 className="text-2xl font-bold">Let&apos;s get started</h1>
                   <p className="text-muted-foreground text-balance">
-                    Login to your account
+                    Create your account
                   </p>
                 </div>
                 <div className="grid gap-3">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="text"
+                            placeholder="John Doe"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   <FormField
                     control={form.control}
                     name="email"
@@ -127,6 +154,23 @@ export const SignInView = () => {
                       </FormItem>
                     )}
                   />
+                  <FormField
+                    control={form.control}
+                    name="confirmPassword"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Confirm Password</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="password"
+                            placeholder="*********"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
                 {!!error && (
                   <Alert className="bg-destructive/10 border-none">
@@ -135,7 +179,7 @@ export const SignInView = () => {
                   </Alert>
                 )}
                 <Button disabled={isLoading} type="submit" className="w-full">
-                  Sign in
+                  Sign up
                 </Button>
                 <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
                   <span className="bg-card text-muted-foreground relative z-10 px-2">
@@ -152,7 +196,7 @@ export const SignInView = () => {
                     variant="outline"
                     className="w-full"
                   >
-                    <FaGoogle className="mr-2" />
+                    Google
                   </Button>
                   <Button
                     onClick={() => {
@@ -163,22 +207,22 @@ export const SignInView = () => {
                     variant="outline"
                     className="w-full"
                   >
-                    <FaGithub className="mr-2" />
+                    Github
                   </Button>
                 </div>
                 <div className="text-center text-sm">
-                  Don&apos;t have an account?{" "}
+                  Already have an account?{" "}
                   <Link
                     className="underline underline-offset-4"
-                    href="/sign-up"
+                    href="/sign-in"
                   >
-                    Sign up
+                    Sign in
                   </Link>
                 </div>
               </div>
             </form>
           </Form>
-          <div className="bg-radial from-green-500 to-green-900 relative hidden md:flex flex-col gap-y-4 items-center justify-center">
+          <div className="bg-radial from-sidebar-accent to-sidebar relative hidden md:flex flex-col gap-y-4 items-center justify-center">
             <Image alt="logo" src="/logo.svg" height={92} width={92} />
             <p className="text-2xl font-semibold text-white">Meet.AI</p>
           </div>

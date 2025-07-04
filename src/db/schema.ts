@@ -90,15 +90,15 @@ export const meetings = pgTable("meetings", {
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  agentsId: text("agent_id")
+  agentId: text("agent_id")
     .notNull()
     .references(() => agents.id, { onDelete: "cascade" }),
   status: meetingStatus("status").notNull().default("upcoming"),
   startedAt: timestamp("started_at"),
   endedAt: timestamp("ended_at"),
-  transcriptUrl: timestamp("transcript_url"),
-  recordingUrl: timestamp("recording_url"),
-  summaryUrl: timestamp("summary"),
-  createdAt: timestamp("created_at"),
-  updatedAt: timestamp("updated_at"),
+  transcriptUrl: text("transcript_url"),
+  recordingUrl: text("recording_url"),
+  summaryUrl: text("summary"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });

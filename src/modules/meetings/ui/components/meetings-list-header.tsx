@@ -8,7 +8,6 @@ import { MeetingsSearchFilter } from "./meetings-search-filter";
 import { StatusFilter } from "./status-filter";
 import { AgentIdFilter } from "./agent-id-filter";
 import { useMeetingsFilters } from "../../hooks/use-meetings-filters";
-import { set } from "date-fns";
 import { ScrollArea } from "@radix-ui/react-scroll-area";
 import { ScrollBar } from "@/components/ui/scroll-area";
 
